@@ -1,0 +1,30 @@
+// This file is @generated
+package com.svix.kotlin.models
+
+import kotlin.time.Instant
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class EndpointOut(
+    /** The Endpoint's ID. */
+    val id: String,
+    val metadata: Map<String, String>,
+    val url: String,
+    val description: String,
+    /**
+     * Maximum messages per second to send to this endpoint.
+     *
+     * Outgoing messages will be throttled to this rate.
+     */
+    val throttleRate: UShort? = null,
+    /** Optional unique identifier for the endpoint. */
+    val uid: String? = null,
+    val disabled: Boolean? = null,
+    val eventTypes: Set<String>? = null,
+    /** List of message channels this endpoint listens to (omit for all). */
+    val channels: Set<String>? = null,
+    val createdAt: Instant,
+    val updatedAt: Instant,
+    /** When the endpoint expires, if ever. No messages are sent to the endpoint after this time. */
+    val expiry: Instant? = null,
+)

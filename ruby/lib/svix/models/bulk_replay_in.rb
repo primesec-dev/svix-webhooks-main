@@ -1,0 +1,67 @@
+# frozen_string_literal: true
+# This file is @generated
+require "json"
+
+module Svix
+  class BulkReplayIn
+    attr_accessor :since
+    attr_accessor :until
+    attr_accessor :event_types
+    attr_accessor :channel
+    attr_accessor :tag
+    attr_accessor :status
+    attr_accessor :status_code_class
+
+    ALL_FIELD ||= ["since", "until", "event_types", "channel", "tag", "status", "status_code_class"].freeze
+    private_constant :ALL_FIELD
+
+    def initialize(attributes = {})
+      unless attributes.is_a?(Hash)
+        fail(ArgumentError, "The input argument (attributes) must be a hash in `Svix::BulkReplayIn` new method")
+      end
+
+      attributes.each do |k, v|
+        unless ALL_FIELD.include?(k.to_s)
+          fail(ArgumentError, "The field #{k} is not part of Svix::BulkReplayIn")
+        end
+
+        instance_variable_set("@#{k}", v)
+        instance_variable_set("@__#{k}_is_defined", true)
+      end
+    end
+
+    def self.deserialize(attributes = {})
+      attributes = attributes.transform_keys(&:to_s)
+      attrs = Hash.new
+      attrs["since"] = DateTime.rfc3339(attributes["since"]).to_time
+      attrs["until"] = DateTime.rfc3339(attributes["until"]).to_time if attributes["until"]
+      attrs["event_types"] = attributes["eventTypes"]
+      attrs["channel"] = attributes["channel"]
+      attrs["tag"] = attributes["tag"]
+      attrs["status"] = Svix::MessageStatus.deserialize(attributes["status"]) if attributes["status"]
+      if attributes["statusCodeClass"]
+        attrs["status_code_class"] = Svix::StatusCodeClass.deserialize(attributes["statusCodeClass"])
+      end
+
+      new(attrs)
+    end
+
+    def serialize
+      out = Hash.new
+      out["since"] = Svix::serialize_primitive(@since) unless @since.nil?
+      out["until"] = Svix::serialize_primitive(@until) unless @until.nil?
+      out["eventTypes"] = Svix::serialize_primitive(@event_types) unless @event_types.nil?
+      out["channel"] = Svix::serialize_primitive(@channel) unless @channel.nil?
+      out["tag"] = Svix::serialize_primitive(@tag) unless @tag.nil?
+      out["status"] = Svix::serialize_schema_ref(@status) unless @status.nil?
+      out["statusCodeClass"] = Svix::serialize_schema_ref(@status_code_class) unless @status_code_class.nil?
+      out
+    end
+
+    # Serializes the object to a json string
+    # @return String
+    def to_json(*args)
+      serialize.to_json(*args)
+    end
+  end
+end

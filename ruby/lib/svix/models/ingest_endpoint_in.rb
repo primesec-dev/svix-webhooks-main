@@ -1,0 +1,75 @@
+# frozen_string_literal: true
+# This file is @generated
+require "json"
+
+module Svix
+  class IngestEndpointIn
+    attr_accessor :url
+    attr_accessor :description
+    # Maximum messages per second to send to this endpoint.
+    #
+    # Outgoing messages will be throttled to this rate.
+    attr_accessor :throttle_rate
+    # Optional unique identifier for the endpoint.
+    attr_accessor :uid
+    attr_accessor :disabled
+    # The endpoint's verification secret.
+    #
+    # Format: `base64` encoded random bytes optionally prefixed with `whsec_`.
+    # It is recommended to not set this and let the server generate the secret.
+    attr_accessor :secret
+    attr_accessor :metadata
+    attr_accessor :headers
+
+    ALL_FIELD ||= ["url", "description", "throttle_rate", "uid", "disabled", "secret", "metadata", "headers"].freeze
+    private_constant :ALL_FIELD
+
+    def initialize(attributes = {})
+      unless attributes.is_a?(Hash)
+        fail(ArgumentError, "The input argument (attributes) must be a hash in `Svix::IngestEndpointIn` new method")
+      end
+
+      attributes.each do |k, v|
+        unless ALL_FIELD.include?(k.to_s)
+          fail(ArgumentError, "The field #{k} is not part of Svix::IngestEndpointIn")
+        end
+
+        instance_variable_set("@#{k}", v)
+        instance_variable_set("@__#{k}_is_defined", true)
+      end
+    end
+
+    def self.deserialize(attributes = {})
+      attributes = attributes.transform_keys(&:to_s)
+      attrs = Hash.new
+      attrs["url"] = attributes["url"]
+      attrs["description"] = attributes["description"]
+      attrs["throttle_rate"] = attributes["throttleRate"]
+      attrs["uid"] = attributes["uid"]
+      attrs["disabled"] = attributes["disabled"]
+      attrs["secret"] = attributes["secret"]
+      attrs["metadata"] = attributes["metadata"]
+      attrs["headers"] = attributes["headers"]
+      new(attrs)
+    end
+
+    def serialize
+      out = Hash.new
+      out["url"] = Svix::serialize_primitive(@url) unless @url.nil?
+      out["description"] = Svix::serialize_primitive(@description) unless @description.nil?
+      out["throttleRate"] = Svix::serialize_primitive(@throttle_rate) unless @throttle_rate.nil?
+      out["uid"] = Svix::serialize_primitive(@uid) unless @uid.nil?
+      out["disabled"] = Svix::serialize_primitive(@disabled) unless @disabled.nil?
+      out["secret"] = Svix::serialize_primitive(@secret) unless @secret.nil?
+      out["metadata"] = Svix::serialize_primitive(@metadata) unless @metadata.nil?
+      out["headers"] = Svix::serialize_primitive(@headers) unless @headers.nil?
+      out
+    end
+
+    # Serializes the object to a json string
+    # @return String
+    def to_json(*args)
+      serialize.to_json(*args)
+    end
+  end
+end

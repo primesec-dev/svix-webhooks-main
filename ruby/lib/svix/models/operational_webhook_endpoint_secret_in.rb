@@ -1,0 +1,60 @@
+# frozen_string_literal: true
+# This file is @generated
+require "json"
+
+module Svix
+  class OperationalWebhookEndpointSecretIn
+    # The endpoint's verification secret.
+    #
+    # Format: `base64` encoded random bytes optionally prefixed with `whsec_`.
+    # It is recommended to not set this and let the server generate the secret.
+    attr_accessor :key
+    # How long the old secret will be valid for, in seconds.
+    #
+    # Valid values are between 0 (immediate expiry) and 7 days.
+    # The default is 24 hours.
+    attr_accessor :grace_period_seconds
+
+    ALL_FIELD ||= ["key", "grace_period_seconds"].freeze
+    private_constant :ALL_FIELD
+
+    def initialize(attributes = {})
+      unless attributes.is_a?(Hash)
+        fail(
+          ArgumentError,
+          "The input argument (attributes) must be a hash in `Svix::OperationalWebhookEndpointSecretIn` new method"
+        )
+      end
+
+      attributes.each do |k, v|
+        unless ALL_FIELD.include?(k.to_s)
+          fail(ArgumentError, "The field #{k} is not part of Svix::OperationalWebhookEndpointSecretIn")
+        end
+
+        instance_variable_set("@#{k}", v)
+        instance_variable_set("@__#{k}_is_defined", true)
+      end
+    end
+
+    def self.deserialize(attributes = {})
+      attributes = attributes.transform_keys(&:to_s)
+      attrs = Hash.new
+      attrs["key"] = attributes["key"]
+      attrs["grace_period_seconds"] = attributes["gracePeriodSeconds"]
+      new(attrs)
+    end
+
+    def serialize
+      out = Hash.new
+      out["key"] = Svix::serialize_primitive(@key) unless @key.nil?
+      out["gracePeriodSeconds"] = Svix::serialize_primitive(@grace_period_seconds) unless @grace_period_seconds.nil?
+      out
+    end
+
+    # Serializes the object to a json string
+    # @return String
+    def to_json(*args)
+      serialize.to_json(*args)
+    end
+  end
+end

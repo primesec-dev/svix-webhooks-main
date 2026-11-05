@@ -1,0 +1,55 @@
+# frozen_string_literal: true
+# This file is @generated
+require "json"
+
+module Svix
+  class AppUsageStatsIn
+    attr_accessor :since
+    attr_accessor :until
+    # Specific app IDs or UIDs to aggregate stats for.
+    #
+    # Note that if none of the given IDs or UIDs are resolved, a 422 response will be given.
+    attr_accessor :app_ids
+
+    ALL_FIELD ||= ["since", "until", "app_ids"].freeze
+    private_constant :ALL_FIELD
+
+    def initialize(attributes = {})
+      unless attributes.is_a?(Hash)
+        fail(ArgumentError, "The input argument (attributes) must be a hash in `Svix::AppUsageStatsIn` new method")
+      end
+
+      attributes.each do |k, v|
+        unless ALL_FIELD.include?(k.to_s)
+          fail(ArgumentError, "The field #{k} is not part of Svix::AppUsageStatsIn")
+        end
+
+        instance_variable_set("@#{k}", v)
+        instance_variable_set("@__#{k}_is_defined", true)
+      end
+    end
+
+    def self.deserialize(attributes = {})
+      attributes = attributes.transform_keys(&:to_s)
+      attrs = Hash.new
+      attrs["since"] = DateTime.rfc3339(attributes["since"]).to_time
+      attrs["until"] = DateTime.rfc3339(attributes["until"]).to_time
+      attrs["app_ids"] = attributes["appIds"]
+      new(attrs)
+    end
+
+    def serialize
+      out = Hash.new
+      out["since"] = Svix::serialize_primitive(@since) unless @since.nil?
+      out["until"] = Svix::serialize_primitive(@until) unless @until.nil?
+      out["appIds"] = Svix::serialize_primitive(@app_ids) unless @app_ids.nil?
+      out
+    end
+
+    # Serializes the object to a json string
+    # @return String
+    def to_json(*args)
+      serialize.to_json(*args)
+    end
+  end
+end

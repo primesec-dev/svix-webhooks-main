@@ -1,0 +1,29 @@
+// This file is @generated
+package com.svix.kotlin.models
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class SinkInCommon(
+    val description: String? = null,
+    /**
+     * Maximum messages per second to send to this endpoint.
+     *
+     * Outgoing messages will be throttled to this rate.
+     */
+    val throttleRate: UShort? = null,
+    /** Optional unique identifier for the sink. */
+    val uid: String? = null,
+    /**
+     * The endpoint's verification secret.
+     *
+     * Format: `base64` encoded random bytes optionally prefixed with `whsec_`. It is recommended to
+     * not set this and let the server generate the secret.
+     */
+    val secret: String? = null,
+    val disabled: Boolean? = null,
+    val eventTypes: Set<String>? = null,
+    /** List of message channels this sink listens to (omit for all). */
+    val channels: Set<String>? = null,
+    val metadata: Map<String, String>? = null,
+)

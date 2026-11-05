@@ -1,0 +1,37 @@
+name: Ruby Lint and Tests
+
+on:
+  workflow_call:
+
+jobs:
+  ruby:
+    name: Ruby Lint and Tests and Tests
+    runs-on: ubuntu-24.04
+
+    strategy:
+      matrix:
+        ruby-version: [3.2.10, 3.3.10, 3.4.9, 4.0.2]
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Pull svix server image (and dependencies)
+        run: docker compose pull
+        working-directory: ./client-integration-tests
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@7f797815d8adceb1c412e7abefdd1ab4abc47a5f # v1.335.0
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+
+      - name: Install dependencies
+        working-directory: ruby
+        run: bundle install
+
+      - name: Build
+        working-directory: ruby
+        run: bundle exec rake build
+
+      - name: Test
+        working-directory: ruby
+        run: bundle exec rspec spec

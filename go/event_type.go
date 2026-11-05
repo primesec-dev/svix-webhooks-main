@@ -1,0 +1,247 @@
+// Package svix this file is @generated DO NOT EDIT
+package svix
+
+import (
+	"context"
+
+	"github.com/svix/svix-webhooks/v2/go/internal"
+	"github.com/svix/svix-webhooks/v2/go/models"
+)
+
+type EventType struct {
+	client *internal.SvixHttpClient
+}
+
+func newEventType(client *internal.SvixHttpClient) EventType {
+	return EventType{client}
+}
+
+type EventTypeListOptions struct {
+	// Limit the number of returned items
+	Limit *uint64
+	// The iterator returned from a prior invocation
+	Iterator *string
+
+	// The sorting order of the returned items
+	Order *models.Ordering
+	// Include archived items in the response.
+	//
+	// Deprecated, use `archive_status` instead. Ignored when `archive_status` is set.
+	IncludeArchived *bool
+
+	// Which items to include based on whether they are archived.
+	//
+	// Defaults to `active`.
+	ArchiveStatus *models.ArchiveStatus
+	// When `true` the full item (including the schema) is included in the response.
+	WithContent *bool
+}
+
+type EventTypeCreateOptions struct {
+	IdempotencyKey *string
+}
+
+type EventTypeImportOpenapiOptions struct {
+	IdempotencyKey *string
+}
+
+type EventTypeDeleteOptions struct {
+	// By default event types are archived when "deleted". Passing this to `true` deletes them
+	// entirely.
+	Expunge *bool
+}
+
+// Return the list of event types.
+func (eventType EventType) List(
+	ctx context.Context,
+	o *EventTypeListOptions,
+) (*models.ListResponseEventTypeOut, error) {
+	var err error
+	queryMap := map[string]string{}
+	if o == nil {
+		opts := EventTypeListOptions{}
+		o = &opts
+	}
+	internal.SerializeParamToMap("limit", o.Limit, queryMap, &err)
+	internal.SerializeParamToMap("iterator", o.Iterator, queryMap, &err)
+	internal.SerializeParamToMap("order", o.Order, queryMap, &err)
+	internal.SerializeParamToMap("include_archived", o.IncludeArchived, queryMap, &err)
+	internal.SerializeParamToMap("archive_status", o.ArchiveStatus, queryMap, &err)
+	internal.SerializeParamToMap("with_content", o.WithContent, queryMap, &err)
+	if err != nil {
+		return nil, err
+	}
+	return internal.ExecuteRequest[any, models.ListResponseEventTypeOut](
+		ctx,
+		eventType.client,
+		"GET",
+		"/api/v1/event-type",
+		nil,
+		queryMap,
+		nil,
+		nil,
+	)
+}
+
+// Create new or unarchive existing event type.
+//
+// Unarchiving an event type will allow endpoints to filter on it and messages to be sent with it.
+// Endpoints filtering on the event type before archival will continue to filter on it.
+// This operation does not preserve the description and schemas.
+func (eventType EventType) Create(
+	ctx context.Context,
+	eventTypeIn models.EventTypeIn,
+	o *EventTypeCreateOptions,
+) (*models.EventTypeOut, error) {
+	var err error
+	headerMap := map[string]string{}
+	if o == nil {
+		opts := EventTypeCreateOptions{}
+		o = &opts
+	}
+	internal.SerializeParamToMap("idempotency-key", o.IdempotencyKey, headerMap, &err)
+	if err != nil {
+		return nil, err
+	}
+	return internal.ExecuteRequest[models.EventTypeIn, models.EventTypeOut](
+		ctx,
+		eventType.client,
+		"POST",
+		"/api/v1/event-type",
+		nil,
+		nil,
+		headerMap,
+		&eventTypeIn,
+	)
+}
+
+// Given an OpenAPI spec, create new or update existing event types.
+//
+// If an existing `archived` event type is updated, it will be unarchived.
+// The importer will convert all webhooks found in the either the `webhooks` or `x-webhooks`
+// top-level.
+func (eventType EventType) ImportOpenapi(
+	ctx context.Context,
+	eventTypeImportOpenApiIn models.EventTypeImportOpenApiIn,
+	o *EventTypeImportOpenapiOptions,
+) (*models.EventTypeImportOpenApiOut, error) {
+	var err error
+	headerMap := map[string]string{}
+	if o == nil {
+		opts := EventTypeImportOpenapiOptions{}
+		o = &opts
+	}
+	internal.SerializeParamToMap("idempotency-key", o.IdempotencyKey, headerMap, &err)
+	if err != nil {
+		return nil, err
+	}
+	return internal.ExecuteRequest[models.EventTypeImportOpenApiIn, models.EventTypeImportOpenApiOut](
+		ctx,
+		eventType.client,
+		"POST",
+		"/api/v1/event-type/import/openapi",
+		nil,
+		nil,
+		headerMap,
+		&eventTypeImportOpenApiIn,
+	)
+}
+
+// Get an event type.
+func (eventType EventType) Get(
+	ctx context.Context,
+	eventTypeName string,
+) (*models.EventTypeOut, error) {
+	pathMap := map[string]string{
+		"event_type_name": eventTypeName,
+	}
+	return internal.ExecuteRequest[any, models.EventTypeOut](
+		ctx,
+		eventType.client,
+		"GET",
+		"/api/v1/event-type/{event_type_name}",
+		pathMap,
+		nil,
+		nil,
+		nil,
+	)
+}
+
+// Create or update an event type.
+func (eventType EventType) Upsert(
+	ctx context.Context,
+	eventTypeName string,
+	eventTypeUpsertIn models.EventTypeUpsertIn,
+) (*models.EventTypeOut, error) {
+	pathMap := map[string]string{
+		"event_type_name": eventTypeName,
+	}
+	return internal.ExecuteRequest[models.EventTypeUpsertIn, models.EventTypeOut](
+		ctx,
+		eventType.client,
+		"PUT",
+		"/api/v1/event-type/{event_type_name}",
+		pathMap,
+		nil,
+		nil,
+		&eventTypeUpsertIn,
+	)
+}
+
+// Archive an event type.
+//
+// Endpoints already configured to filter on an event type will continue to do so after archival.
+// However, new messages can not be sent with it and endpoints can not filter on it.
+// An event type can be unarchived with the
+// [patch operation](#operation/v1.event-type.patch) by setting `archived` to `false`.
+func (eventType EventType) Delete(
+	ctx context.Context,
+	eventTypeName string,
+	o *EventTypeDeleteOptions,
+) error {
+	var err error
+	pathMap := map[string]string{
+		"event_type_name": eventTypeName,
+	}
+	queryMap := map[string]string{}
+	if o == nil {
+		opts := EventTypeDeleteOptions{}
+		o = &opts
+	}
+	internal.SerializeParamToMap("expunge", o.Expunge, queryMap, &err)
+	if err != nil {
+		return err
+	}
+	_, err = internal.ExecuteRequest[any, any](
+		ctx,
+		eventType.client,
+		"DELETE",
+		"/api/v1/event-type/{event_type_name}",
+		pathMap,
+		queryMap,
+		nil,
+		nil,
+	)
+	return err
+}
+
+// Partially update an event type.
+func (eventType EventType) Patch(
+	ctx context.Context,
+	eventTypeName string,
+	eventTypePatch models.EventTypePatch,
+) (*models.EventTypeOut, error) {
+	pathMap := map[string]string{
+		"event_type_name": eventTypeName,
+	}
+	return internal.ExecuteRequest[models.EventTypePatch, models.EventTypeOut](
+		ctx,
+		eventType.client,
+		"PATCH",
+		"/api/v1/event-type/{event_type_name}",
+		pathMap,
+		nil,
+		nil,
+		&eventTypePatch,
+	)
+}

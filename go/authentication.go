@@ -1,0 +1,291 @@
+// Package svix this file is @generated DO NOT EDIT
+package svix
+
+import (
+	"context"
+
+	"github.com/svix/svix-webhooks/v2/go/internal"
+	"github.com/svix/svix-webhooks/v2/go/models"
+)
+
+type Authentication struct {
+	client *internal.SvixHttpClient
+}
+
+func newAuthentication(client *internal.SvixHttpClient) Authentication {
+	return Authentication{client}
+}
+
+type AuthenticationAppPortalAccessOptions struct {
+	IdempotencyKey *string
+}
+
+type AuthenticationLogoutOptions struct {
+	IdempotencyKey *string
+}
+
+type AuthenticationExpireAllOptions struct {
+	IdempotencyKey *string
+}
+
+type AuthenticationStreamPortalAccessOptions struct {
+	IdempotencyKey *string
+}
+
+type AuthenticationStreamLogoutOptions struct {
+	IdempotencyKey *string
+}
+
+type AuthenticationStreamExpireAllOptions struct {
+	IdempotencyKey *string
+}
+
+type AuthenticationRotateStreamPollerTokenOptions struct {
+	IdempotencyKey *string
+}
+
+// Use this function to get magic links (and authentication codes) for connecting your users to the Consumer Application Portal.
+func (authentication Authentication) AppPortalAccess(
+	ctx context.Context,
+	appId string,
+	appPortalAccessIn models.AppPortalAccessIn,
+	o *AuthenticationAppPortalAccessOptions,
+) (*models.AppPortalAccessOut, error) {
+	var err error
+	pathMap := map[string]string{
+		"app_id": appId,
+	}
+	headerMap := map[string]string{}
+	if o == nil {
+		opts := AuthenticationAppPortalAccessOptions{}
+		o = &opts
+	}
+	internal.SerializeParamToMap("idempotency-key", o.IdempotencyKey, headerMap, &err)
+	if err != nil {
+		return nil, err
+	}
+	return internal.ExecuteRequest[models.AppPortalAccessIn, models.AppPortalAccessOut](
+		ctx,
+		authentication.client,
+		"POST",
+		"/api/v1/auth/app-portal-access/{app_id}",
+		pathMap,
+		nil,
+		headerMap,
+		&appPortalAccessIn,
+	)
+}
+
+// Logout an app token.
+//
+// Trying to log out other tokens will fail.
+func (authentication Authentication) Logout(
+	ctx context.Context,
+	o *AuthenticationLogoutOptions,
+) error {
+	var err error
+	headerMap := map[string]string{}
+	if o == nil {
+		opts := AuthenticationLogoutOptions{}
+		o = &opts
+	}
+	internal.SerializeParamToMap("idempotency-key", o.IdempotencyKey, headerMap, &err)
+	if err != nil {
+		return err
+	}
+	_, err = internal.ExecuteRequest[any, any](
+		ctx,
+		authentication.client,
+		"POST",
+		"/api/v1/auth/logout",
+		nil,
+		nil,
+		headerMap,
+		nil,
+	)
+	return err
+}
+
+// Expire all of the tokens associated with a specific application.
+func (authentication Authentication) ExpireAll(
+	ctx context.Context,
+	appId string,
+	applicationTokenExpireIn models.ApplicationTokenExpireIn,
+	o *AuthenticationExpireAllOptions,
+) error {
+	var err error
+	pathMap := map[string]string{
+		"app_id": appId,
+	}
+	headerMap := map[string]string{}
+	if o == nil {
+		opts := AuthenticationExpireAllOptions{}
+		o = &opts
+	}
+	internal.SerializeParamToMap("idempotency-key", o.IdempotencyKey, headerMap, &err)
+	if err != nil {
+		return err
+	}
+	_, err = internal.ExecuteRequest[models.ApplicationTokenExpireIn, any](
+		ctx,
+		authentication.client,
+		"POST",
+		"/api/v1/auth/app/{app_id}/expire-all",
+		pathMap,
+		nil,
+		headerMap,
+		&applicationTokenExpireIn,
+	)
+	return err
+}
+
+// Use this function to get magic links (and authentication codes) for connecting your users to the Stream Consumer Portal.
+func (authentication Authentication) StreamPortalAccess(
+	ctx context.Context,
+	streamId string,
+	streamPortalAccessIn models.StreamPortalAccessIn,
+	o *AuthenticationStreamPortalAccessOptions,
+) (*models.AppPortalAccessOut, error) {
+	var err error
+	pathMap := map[string]string{
+		"stream_id": streamId,
+	}
+	headerMap := map[string]string{}
+	if o == nil {
+		opts := AuthenticationStreamPortalAccessOptions{}
+		o = &opts
+	}
+	internal.SerializeParamToMap("idempotency-key", o.IdempotencyKey, headerMap, &err)
+	if err != nil {
+		return nil, err
+	}
+	return internal.ExecuteRequest[models.StreamPortalAccessIn, models.AppPortalAccessOut](
+		ctx,
+		authentication.client,
+		"POST",
+		"/api/v1/auth/stream-portal-access/{stream_id}",
+		pathMap,
+		nil,
+		headerMap,
+		&streamPortalAccessIn,
+	)
+}
+
+// Logout a stream token.
+//
+// Trying to log out other tokens will fail.
+func (authentication Authentication) StreamLogout(
+	ctx context.Context,
+	o *AuthenticationStreamLogoutOptions,
+) error {
+	var err error
+	headerMap := map[string]string{}
+	if o == nil {
+		opts := AuthenticationStreamLogoutOptions{}
+		o = &opts
+	}
+	internal.SerializeParamToMap("idempotency-key", o.IdempotencyKey, headerMap, &err)
+	if err != nil {
+		return err
+	}
+	_, err = internal.ExecuteRequest[any, any](
+		ctx,
+		authentication.client,
+		"POST",
+		"/api/v1/auth/stream-logout",
+		nil,
+		nil,
+		headerMap,
+		nil,
+	)
+	return err
+}
+
+// Expire all of the tokens associated with a specific stream.
+func (authentication Authentication) StreamExpireAll(
+	ctx context.Context,
+	streamId string,
+	streamTokenExpireIn models.StreamTokenExpireIn,
+	o *AuthenticationStreamExpireAllOptions,
+) error {
+	var err error
+	pathMap := map[string]string{
+		"stream_id": streamId,
+	}
+	headerMap := map[string]string{}
+	if o == nil {
+		opts := AuthenticationStreamExpireAllOptions{}
+		o = &opts
+	}
+	internal.SerializeParamToMap("idempotency-key", o.IdempotencyKey, headerMap, &err)
+	if err != nil {
+		return err
+	}
+	_, err = internal.ExecuteRequest[models.StreamTokenExpireIn, any](
+		ctx,
+		authentication.client,
+		"POST",
+		"/api/v1/auth/stream/{stream_id}/expire-all",
+		pathMap,
+		nil,
+		headerMap,
+		&streamTokenExpireIn,
+	)
+	return err
+}
+
+// Create a new auth token for the stream poller API.
+func (authentication Authentication) RotateStreamPollerToken(
+	ctx context.Context,
+	streamId string,
+	sinkId string,
+	rotatePollerTokenIn models.RotatePollerTokenIn,
+	o *AuthenticationRotateStreamPollerTokenOptions,
+) (*models.ApiTokenOut, error) {
+	var err error
+	pathMap := map[string]string{
+		"stream_id": streamId,
+		"sink_id":   sinkId,
+	}
+	headerMap := map[string]string{}
+	if o == nil {
+		opts := AuthenticationRotateStreamPollerTokenOptions{}
+		o = &opts
+	}
+	internal.SerializeParamToMap("idempotency-key", o.IdempotencyKey, headerMap, &err)
+	if err != nil {
+		return nil, err
+	}
+	return internal.ExecuteRequest[models.RotatePollerTokenIn, models.ApiTokenOut](
+		ctx,
+		authentication.client,
+		"POST",
+		"/api/v1/auth/stream/{stream_id}/sink/{sink_id}/poller/token/rotate",
+		pathMap,
+		nil,
+		headerMap,
+		&rotatePollerTokenIn,
+	)
+}
+
+// Get the current auth token for the stream poller.
+func (authentication Authentication) GetStreamPollerToken(
+	ctx context.Context,
+	streamId string,
+	sinkId string,
+) (*models.ApiTokenOut, error) {
+	pathMap := map[string]string{
+		"stream_id": streamId,
+		"sink_id":   sinkId,
+	}
+	return internal.ExecuteRequest[any, models.ApiTokenOut](
+		ctx,
+		authentication.client,
+		"GET",
+		"/api/v1/auth/stream/{stream_id}/sink/{sink_id}/poller/token",
+		pathMap,
+		nil,
+		nil,
+		nil,
+	)
+}

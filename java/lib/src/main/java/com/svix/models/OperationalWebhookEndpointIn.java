@@ -1,0 +1,261 @@
+// This file is @generated
+package com.svix.models;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.svix.Utils;
+
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.net.URI;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Set;
+
+@ToString
+@EqualsAndHashCode
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
+public class OperationalWebhookEndpointIn {
+    @JsonProperty private URI url;
+    @JsonProperty private String description;
+    @JsonProperty private Short throttleRate;
+    @JsonProperty private String uid;
+    @JsonProperty private Boolean disabled;
+    @JsonProperty private Set<String> eventTypes;
+    @JsonProperty private String secret;
+    @JsonProperty private Map<String, String> metadata;
+    @JsonProperty private Map<String, String> headers;
+
+    public OperationalWebhookEndpointIn() {}
+
+    public OperationalWebhookEndpointIn url(URI url) {
+        this.url = url;
+        return this;
+    }
+
+    /**
+     * Get url
+     *
+     * @return url
+     */
+    @javax.annotation.Nonnull
+    public URI getUrl() {
+        return url;
+    }
+
+    public void setUrl(URI url) {
+        this.url = url;
+    }
+
+    public OperationalWebhookEndpointIn description(String description) {
+        this.description = description;
+        return this;
+    }
+
+    /**
+     * Get description
+     *
+     * @return description
+     */
+    @javax.annotation.Nullable
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public OperationalWebhookEndpointIn throttleRate(Short throttleRate) {
+        this.throttleRate = throttleRate;
+        return this;
+    }
+
+    /**
+     * Maximum messages per second to send to this endpoint.
+     *
+     * <p>Outgoing messages will be throttled to this rate.
+     *
+     * @return throttleRate
+     */
+    @javax.annotation.Nullable
+    public Short getThrottleRate() {
+        return throttleRate;
+    }
+
+    public void setThrottleRate(Short throttleRate) {
+        this.throttleRate = throttleRate;
+    }
+
+    public OperationalWebhookEndpointIn uid(String uid) {
+        this.uid = uid;
+        return this;
+    }
+
+    /**
+     * Optional unique identifier for the endpoint.
+     *
+     * @return uid
+     */
+    @javax.annotation.Nullable
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public OperationalWebhookEndpointIn disabled(Boolean disabled) {
+        this.disabled = disabled;
+        return this;
+    }
+
+    /**
+     * Get disabled
+     *
+     * @return disabled
+     */
+    @javax.annotation.Nullable
+    public Boolean getDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(Boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public OperationalWebhookEndpointIn eventTypes(Set<String> eventTypes) {
+        this.eventTypes = eventTypes;
+        return this;
+    }
+
+    public OperationalWebhookEndpointIn addEventTypesItem(String eventTypesItem) {
+        if (this.eventTypes == null) {
+            this.eventTypes = new LinkedHashSet<>();
+        }
+        this.eventTypes.add(eventTypesItem);
+
+        return this;
+    }
+
+    /**
+     * Get eventTypes
+     *
+     * @return eventTypes
+     */
+    @javax.annotation.Nullable
+    public Set<String> getEventTypes() {
+        return eventTypes;
+    }
+
+    public void setEventTypes(Set<String> eventTypes) {
+        this.eventTypes = eventTypes;
+    }
+
+    public OperationalWebhookEndpointIn secret(String secret) {
+        this.secret = secret;
+        return this;
+    }
+
+    /**
+     * The endpoint's verification secret.
+     *
+     * <p>Format: `base64` encoded random bytes optionally prefixed with `whsec_`. It is recommended
+     * to not set this and let the server generate the secret.
+     *
+     * @return secret
+     */
+    @javax.annotation.Nullable
+    public String getSecret() {
+        return secret;
+    }
+
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    public OperationalWebhookEndpointIn metadata(Map<String, String> metadata) {
+        this.metadata = metadata;
+        return this;
+    }
+
+    public OperationalWebhookEndpointIn putMetadataItem(String key, String metadataItem) {
+        if (this.metadata == null) {
+            this.metadata = new HashMap<>();
+        }
+        this.metadata.put(key, metadataItem);
+
+        return this;
+    }
+
+    /**
+     * Get metadata
+     *
+     * @return metadata
+     */
+    @javax.annotation.Nullable
+    public Map<String, String> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Map<String, String> metadata) {
+        this.metadata = metadata;
+    }
+
+    public OperationalWebhookEndpointIn headers(Map<String, String> headers) {
+        this.headers = headers;
+        return this;
+    }
+
+    public OperationalWebhookEndpointIn putHeadersItem(String key, String headersItem) {
+        if (this.headers == null) {
+            this.headers = new HashMap<>();
+        }
+        this.headers.put(key, headersItem);
+
+        return this;
+    }
+
+    /**
+     * Get headers
+     *
+     * @return headers
+     */
+    @javax.annotation.Nullable
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
+    }
+
+    /**
+     * Create an instance of OperationalWebhookEndpointIn given an JSON string
+     *
+     * @param jsonString JSON string
+     * @return An instance of OperationalWebhookEndpointIn
+     * @throws JsonProcessingException if the JSON string is invalid with respect to
+     *     OperationalWebhookEndpointIn
+     */
+    public static OperationalWebhookEndpointIn fromJson(String jsonString)
+            throws JsonProcessingException {
+        return Utils.getObjectMapper().readValue(jsonString, OperationalWebhookEndpointIn.class);
+    }
+
+    /**
+     * Convert an instance of OperationalWebhookEndpointIn to an JSON string
+     *
+     * @return JSON string
+     */
+    public String toJson() throws JsonProcessingException {
+        return Utils.getObjectMapper().writeValueAsString(this);
+    }
+}

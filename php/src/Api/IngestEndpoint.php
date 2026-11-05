@@ -1,0 +1,176 @@
+<?php
+
+// this file is @generated
+declare(strict_types=1);
+
+namespace Svix\Api;
+
+use Svix\Exception\ApiException;
+use Svix\Models\IngestEndpointHeadersIn;
+use Svix\Models\IngestEndpointHeadersOut;
+use Svix\Models\IngestEndpointIn;
+use Svix\Models\IngestEndpointOut;
+use Svix\Models\IngestEndpointSecretIn;
+use Svix\Models\IngestEndpointSecretOut;
+use Svix\Models\IngestEndpointUpsertIn;
+use Svix\Models\ListResponseIngestEndpointOut;
+use Svix\Request\SvixHttpClient;
+
+class IngestEndpoint
+{
+    public IngestEndpointTransformation $transformation;
+
+    public function __construct(
+        private readonly SvixHttpClient $client,
+    ) {
+        $this->transformation = new IngestEndpointTransformation($client);
+    }
+
+    /**
+     * List ingest endpoints.
+     *
+     * @throws ApiException
+     */
+    public function list(
+        string $sourceId,
+        IngestEndpointListOptions $options = new IngestEndpointListOptions(),
+    ): ListResponseIngestEndpointOut {
+        $request = $this->client->newReq('GET', "/ingest/api/v1/source/{$sourceId}/endpoint");
+        $request->setQueryParam('limit', $options->limit);
+        $request->setQueryParam('iterator', $options->iterator);
+        $request->setQueryParam('order', $options->order);
+        $res = $this->client->send($request);
+
+        return ListResponseIngestEndpointOut::fromJson($res);
+    }
+
+    /**
+     * Create an ingest endpoint.
+     *
+     * @throws ApiException
+     */
+    public function create(
+        string $sourceId,
+        IngestEndpointIn $ingestEndpointIn,
+        IngestEndpointCreateOptions $options = new IngestEndpointCreateOptions(),
+    ): IngestEndpointOut {
+        $request = $this->client->newReq('POST', "/ingest/api/v1/source/{$sourceId}/endpoint");
+        $request->setHeaderParam('idempotency-key', $options->idempotencyKey);
+        $request->setBody(json_encode($ingestEndpointIn));
+        $res = $this->client->send($request);
+
+        return IngestEndpointOut::fromJson($res);
+    }
+
+    /**
+     * Get an ingest endpoint.
+     *
+     * @throws ApiException
+     */
+    public function get(
+        string $sourceId,
+        string $endpointId,
+    ): IngestEndpointOut {
+        $request = $this->client->newReq('GET', "/ingest/api/v1/source/{$sourceId}/endpoint/{$endpointId}");
+        $res = $this->client->send($request);
+
+        return IngestEndpointOut::fromJson($res);
+    }
+
+    /**
+     * Create or update an ingest endpoint.
+     *
+     * @throws ApiException
+     */
+    public function upsert(
+        string $sourceId,
+        string $endpointId,
+        IngestEndpointUpsertIn $ingestEndpointUpsertIn,
+    ): IngestEndpointOut {
+        $request = $this->client->newReq('PUT', "/ingest/api/v1/source/{$sourceId}/endpoint/{$endpointId}");
+        $request->setBody(json_encode($ingestEndpointUpsertIn));
+        $res = $this->client->send($request);
+
+        return IngestEndpointOut::fromJson($res);
+    }
+
+    /**
+     * Delete an ingest endpoint.
+     *
+     * @throws ApiException
+     */
+    public function delete(
+        string $sourceId,
+        string $endpointId,
+    ): void {
+        $request = $this->client->newReq('DELETE', "/ingest/api/v1/source/{$sourceId}/endpoint/{$endpointId}");
+        $res = $this->client->sendNoResponseBody($request);
+    }
+
+    /**
+     * Get an ingest endpoint's signing secret.
+     *
+     * This is used to verify the authenticity of the webhook.
+     * For more information please refer to [the consuming webhooks docs](https://docs.svix.com/consuming-webhooks/).
+     *
+     * @throws ApiException
+     */
+    public function getSecret(
+        string $sourceId,
+        string $endpointId,
+    ): IngestEndpointSecretOut {
+        $request = $this->client->newReq('GET', "/ingest/api/v1/source/{$sourceId}/endpoint/{$endpointId}/secret");
+        $res = $this->client->send($request);
+
+        return IngestEndpointSecretOut::fromJson($res);
+    }
+
+    /**
+     * Rotates an ingest endpoint's signing secret.
+     *
+     * The previous secret will remain valid for the specified grace period (default 24 hours).
+     *
+     * @throws ApiException
+     */
+    public function rotateSecret(
+        string $sourceId,
+        string $endpointId,
+        IngestEndpointSecretIn $ingestEndpointSecretIn,
+        IngestEndpointRotateSecretOptions $options = new IngestEndpointRotateSecretOptions(),
+    ): void {
+        $request = $this->client->newReq('POST', "/ingest/api/v1/source/{$sourceId}/endpoint/{$endpointId}/secret/rotate");
+        $request->setHeaderParam('idempotency-key', $options->idempotencyKey);
+        $request->setBody(json_encode($ingestEndpointSecretIn));
+        $res = $this->client->sendNoResponseBody($request);
+    }
+
+    /**
+     * Get the additional headers to be sent with the ingest.
+     *
+     * @throws ApiException
+     */
+    public function getHeaders(
+        string $sourceId,
+        string $endpointId,
+    ): IngestEndpointHeadersOut {
+        $request = $this->client->newReq('GET', "/ingest/api/v1/source/{$sourceId}/endpoint/{$endpointId}/headers");
+        $res = $this->client->send($request);
+
+        return IngestEndpointHeadersOut::fromJson($res);
+    }
+
+    /**
+     * Set the additional headers to be sent to the endpoint.
+     *
+     * @throws ApiException
+     */
+    public function setHeaders(
+        string $sourceId,
+        string $endpointId,
+        IngestEndpointHeadersIn $ingestEndpointHeadersIn,
+    ): void {
+        $request = $this->client->newReq('PUT', "/ingest/api/v1/source/{$sourceId}/endpoint/{$endpointId}/headers");
+        $request->setBody(json_encode($ingestEndpointHeadersIn));
+        $res = $this->client->sendNoResponseBody($request);
+    }
+}

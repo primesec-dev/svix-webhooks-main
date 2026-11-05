@@ -1,0 +1,42 @@
+// this file is @generated
+using System.Text;
+using Newtonsoft.Json;
+
+namespace Svix.Models
+{
+    public class ApplicationPatch
+    {
+        [JsonProperty("name")]
+        public string? Name { get; set; } = null;
+
+        public bool ShouldSerializeName() => Name != null;
+
+        [JsonProperty("throttleRate")]
+        public MaybeUnset<ushort?> ThrottleRate { get; set; } = MaybeUnset<ushort?>.Unset();
+
+        public bool ShouldSerializeThrottleRate() => !ThrottleRate.IsUnset;
+
+        [JsonProperty("uid")]
+        public MaybeUnset<string?> Uid { get; set; } = MaybeUnset<string?>.Unset();
+
+        public bool ShouldSerializeUid() => !Uid.IsUnset;
+
+        [JsonProperty("metadata")]
+        public Dictionary<string, string>? Metadata { get; set; } = null;
+
+        public bool ShouldSerializeMetadata() => Metadata != null;
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append("class ApplicationPatch {\n");
+            sb.Append("  Name: ").Append(Name).Append('\n');
+            sb.Append("  ThrottleRate: ").Append(ThrottleRate).Append('\n');
+            sb.Append("  Uid: ").Append(Uid).Append('\n');
+            sb.Append("  Metadata: ").Append(Metadata).Append('\n');
+            sb.Append("}\n");
+            return sb.ToString();
+        }
+    }
+}

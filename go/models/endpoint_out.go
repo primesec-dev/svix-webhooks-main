@@ -1,0 +1,24 @@
+// Package svix this file is @generated DO NOT EDIT
+package models
+
+import "time"
+
+type EndpointOut struct {
+	Id          string            `json:"id"` // The Endpoint's ID.
+	Metadata    map[string]string `json:"metadata"`
+	Url         string            `json:"url"`
+	Description string            `json:"description"`
+	// Maximum messages per second to send to this endpoint.
+	//
+	// Outgoing messages will be throttled to this rate.
+	ThrottleRate *uint16   `json:"throttleRate,omitempty"`
+	Uid          *string   `json:"uid,omitempty"` // Optional unique identifier for the endpoint.
+	Disabled     *bool     `json:"disabled,omitempty"`
+	EventTypes   []string  `json:"eventTypes,omitempty"`
+	Channels     []string  `json:"channels,omitempty"` // List of message channels this endpoint listens to (omit for all).
+	CreatedAt    time.Time `json:"createdAt"`
+	UpdatedAt    time.Time `json:"updatedAt"`
+	// When the endpoint expires, if ever. No messages are sent to the
+	// endpoint after this time.
+	Expiry *time.Time `json:"expiry,omitempty"`
+}

@@ -1,0 +1,135 @@
+// This file is @generated
+package com.svix.models;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.svix.Utils;
+
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@ToString
+@EqualsAndHashCode
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE)
+public class ApplicationIn {
+    @JsonProperty private String name;
+    @JsonProperty private Short throttleRate;
+    @JsonProperty private String uid;
+    @JsonProperty private Map<String, String> metadata;
+
+    public ApplicationIn() {}
+
+    public ApplicationIn name(String name) {
+        this.name = name;
+        return this;
+    }
+
+    /**
+     * Application name for human consumption.
+     *
+     * @return name
+     */
+    @javax.annotation.Nonnull
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ApplicationIn throttleRate(Short throttleRate) {
+        this.throttleRate = throttleRate;
+        return this;
+    }
+
+    /**
+     * Maximum messages per second to send to this application.
+     *
+     * <p>Outgoing messages will be throttled to this rate.
+     *
+     * @return throttleRate
+     */
+    @javax.annotation.Nullable
+    public Short getThrottleRate() {
+        return throttleRate;
+    }
+
+    public void setThrottleRate(Short throttleRate) {
+        this.throttleRate = throttleRate;
+    }
+
+    public ApplicationIn uid(String uid) {
+        this.uid = uid;
+        return this;
+    }
+
+    /**
+     * Optional unique identifier for the application.
+     *
+     * @return uid
+     */
+    @javax.annotation.Nullable
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public ApplicationIn metadata(Map<String, String> metadata) {
+        this.metadata = metadata;
+        return this;
+    }
+
+    public ApplicationIn putMetadataItem(String key, String metadataItem) {
+        if (this.metadata == null) {
+            this.metadata = new HashMap<>();
+        }
+        this.metadata.put(key, metadataItem);
+
+        return this;
+    }
+
+    /**
+     * Get metadata
+     *
+     * @return metadata
+     */
+    @javax.annotation.Nullable
+    public Map<String, String> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Map<String, String> metadata) {
+        this.metadata = metadata;
+    }
+
+    /**
+     * Create an instance of ApplicationIn given an JSON string
+     *
+     * @param jsonString JSON string
+     * @return An instance of ApplicationIn
+     * @throws JsonProcessingException if the JSON string is invalid with respect to ApplicationIn
+     */
+    public static ApplicationIn fromJson(String jsonString) throws JsonProcessingException {
+        return Utils.getObjectMapper().readValue(jsonString, ApplicationIn.class);
+    }
+
+    /**
+     * Convert an instance of ApplicationIn to an JSON string
+     *
+     * @return JSON string
+     */
+    public String toJson() throws JsonProcessingException {
+        return Utils.getObjectMapper().writeValueAsString(this);
+    }
+}

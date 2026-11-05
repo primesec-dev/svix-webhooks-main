@@ -1,0 +1,582 @@
+require "spec_helper"
+require "svix"
+
+require_relative "json_responses"
+
+describe "API Client" do
+  let!(:svx) { Svix::Client.new("testsk_token.eu", Svix::SvixOptions.new(false, "http://api.example")) }
+  let(:host) { "http://api.example" }
+
+  it "token/user-agent is sent" do
+    stub_request(:get, "#{host}/api/v1/app")
+      .to_return(
+        status: 200,
+        body: ListResponseAppOut_JSON
+      )
+
+    svx.application.list
+    expect(WebMock).to(
+      have_requested(:get, "#{host}/api/v1/app")
+        .with(
+          headers: {
+            "Authorization" => "Bearer testsk_token.eu",
+            "User-Agent" => "svix-libs/#{Svix::VERSION}/ruby ruby/#{RUBY_VERSION} #{RbConfig::CONFIG["host_os"]}/#{RbConfig::CONFIG["host_cpu"]}"
+          }
+        )
+    )
+  end
+
+  [
+    ["http://api.example/", "http://api.example/api/v1/app"],
+    ["http://api.example///", "http://api.example/api/v1/app"],
+    ["http://api.example/prefix/", "http://api.example/prefix/api/v1/app"],
+    ["http://api.example/prefix", "http://api.example/prefix/api/v1/app"]
+  ].each do |server_url, expected_url|
+    it "strips trailing slashes from server url #{server_url}" do
+      stub_request(:get, expected_url)
+        .to_return(
+          status: 200,
+          body: ListResponseAppOut_JSON
+        )
+
+      client = Svix::Client.new("testsk_token.eu", Svix::SvixOptions.new(false, server_url))
+      client.application.list
+
+      expect(WebMock).to(have_requested(:get, expected_url))
+    end
+  end
+
+  it "test hashtag in query param" do
+    stub_request(:get, "#{host}/api/v1/app/app_id/attempt/endpoint/endpoint_id")
+      .with(query: hash_including({}))
+      .to_return(
+        status: 200,
+        body: ListResponseMessageAttemptOut_JSON
+      )
+
+    svx.message_attempt.list_by_endpoint("app_id", "endpoint_id", {tag: "#"})
+
+    expect(WebMock).to(have_requested(:get, "#{host}/api/v1/app/app_id/attempt/endpoint/endpoint_id?expanded_statuses=true&with_content=false&tag=%23"))
+  end
+
+  it "encodes integer and boolean query params" do
+    stub_request(:get, "#{host}/api/v1/app/app_id/msg")
+      .with(query: hash_including({}))
+      .to_return(
+        status: 200,
+        body: ListResponseMessageOut_JSON
+      )
+
+    svx.message.list("app_id", {limit: 5, with_content: true})
+
+    expect(WebMock).to(
+      have_requested(
+        :get,
+        "#{host}/api/v1/app/app_id/msg?limit=5&with_content=true"
+      )
+    )
+  end
+
+  it "test Date in query param" do
+    stub_request(:get, "#{host}/api/v1/app/app_id/attempt/endpoint/endpoint_id")
+      .with(query: hash_including({}))
+      .to_return(
+        status: 200,
+        body: ListResponseMessageAttemptOut_JSON
+      )
+
+    svx.message_attempt.list_by_endpoint("app_id", "endpoint_id", {tag: "#", before: Time.at(1740602143)})
+
+    expect(WebMock).to(
+      have_requested(
+        :get,
+        "#{host}/api/v1/app/app_id/attempt/endpoint/endpoint_id?expanded_statuses=true&with_content=false&tag=%23&before=2025-02-26T20%3A35%3A43%2B00%3A00"
+      )
+    )
+  end
+
+  it "test Date request body" do
+    stub_request(:post, "#{host}/api/v1/app/app_id/endpoint/endpoint_id/replay-missing")
+      .to_return(
+        status: 200,
+        body: ReplayOut_JSON
+      )
+
+    svx.endpoint.replay_missing("app_id", "endpoint_id", Svix::ReplayIn.new(since: Time.at(1740602143)))
+
+    expect(WebMock).to(
+      have_requested(
+        :post,
+        "#{host}/api/v1/app/app_id/endpoint/endpoint_id/replay-missing"
+      )
+        .with(body: "{\"since\":\"2025-02-26T20:35:43+00:00\"}")
+    )
+  end
+
+  it "test Date response body" do
+    stub_request(:get, "#{host}/api/v1/app/app_id/attempt/endpoint/endpoint_id")
+      .with(query: hash_including({}))
+      .to_return(
+        status: 200,
+        body: ListResponseMessageAttemptOut_JSON
+      )
+
+    res = svx.message_attempt.list_by_endpoint("app_id", "endpoint_id")
+    expect(res.data[0].timestamp.to_i).to(be(1566656122))
+
+    expect(WebMock).to(
+      have_requested(
+        :get,
+        "#{host}/api/v1/app/app_id/attempt/endpoint/endpoint_id?expanded_statuses=true&with_content=false"
+      )
+    )
+  end
+
+  it "test listResponseOut deserializes correctly" do
+    stub_request(:get, "#{host}/api/v1/app/app_id/attempt/endpoint/endpoint_id")
+      .with(query: hash_including({}))
+      .to_return(
+        status: 200,
+        body: "{\"data\":[],\"iterator\":null,\"prevIterator\":null,\"done\":true}"
+      )
+    svx.message_attempt.list_by_endpoint("app_id", "endpoint_id")
+
+    expect(WebMock).to(
+      have_requested(
+        :get,
+        "#{host}/api/v1/app/app_id/attempt/endpoint/endpoint_id?expanded_statuses=true&with_content=false"
+      )
+    )
+  end
+
+  it "test enum as query param" do
+    stub_request(:get, "#{host}/api/v1/app")
+      .with(query: hash_including({}))
+      .to_return(
+        status: 200,
+        body: ListResponseAppOut_JSON
+      )
+    svx.application.list({order: Svix::Ordering::ASCENDING})
+
+    expect(WebMock).to(
+      have_requested(
+        :get,
+        "#{host}/api/v1/app?order=ascending"
+      )
+    )
+  end
+
+  it "test list as query param" do
+    stub_request(:get, "#{host}/api/v1/app/app_id/msg")
+      .with(query: hash_including({}))
+      .to_return(
+        status: 200,
+        body: ListResponseMessageOut_JSON
+      )
+
+    svx.message.list("app_id", {event_types: ["val8", "val1", "val5"]})
+
+    expect(WebMock).to(
+      have_requested(
+        :get,
+        "#{host}/api/v1/app/app_id/msg?event_types=val1%2Cval5%2Cval8&with_content=false"
+      )
+    )
+  end
+
+  it "test header param sent" do
+    stub_request(:post, "#{host}/api/v1/app/app_id/msg")
+      .with(query: hash_including({}))
+      .to_return(
+        status: 200,
+        body: MessageOut_JSON
+      )
+
+    svx.message.create("app_id", Svix::MessageIn.new(event_type: "event.type"), {"idempotency-key": "random-key"})
+    expect(WebMock).to(
+      have_requested(
+        :post,
+        "#{host}/api/v1/app/app_id/msg?with_content=false"
+      )
+        .with(
+          headers: {
+            "idempotency-key" => "random-key"
+          }
+        )
+    )
+  end
+
+  it "no body in response does not return anything" do
+    stub_request(:delete, "#{host}/api/v1/app/app_id")
+      .to_return(
+        status: 204
+      )
+
+    res = svx.application.delete("app_id")
+
+    expect(res).to(be(nil))
+
+    expect(WebMock).to(
+      have_requested(
+        :delete,
+        "#{host}/api/v1/app/app_id"
+      )
+    )
+  end
+
+  it "sub-resource works" do
+    stub_request(:get, "#{host}/api/v1/operational-webhook/endpoint")
+      .to_return(
+        status: 200,
+        body: ListResponseOperationalWebhookEndpointOut_JSON
+      )
+
+    svx.operational_webhook.endpoint.list
+
+    expect(WebMock).to(
+      have_requested(
+        :get,
+        "#{host}/api/v1/operational-webhook/endpoint"
+      )
+    )
+  end
+
+  it "integer enum deserialization" do
+    stub_request(:get, "#{host}/api/v1/app/app_id/attempt/endpoint/endpoint_id")
+      .with(query: hash_including({}))
+      .to_return(
+        status: 200,
+        body: ListResponseMessageAttemptOut_JSON
+      )
+
+    res = svx.message_attempt.list_by_endpoint("app_id", "endpoint_id")
+    expect(res.data[0].trigger_type).to(be(0))
+  end
+
+  it "string enum de/serialization" do
+    stub_request(:get, "#{host}/api/v1/background-task")
+      .with(query: hash_including({}))
+      .to_return(
+        status: 200,
+        body: ListResponseBackgroundTaskOut_JSON
+      )
+
+    res = svx.background_task.list({task: Svix::BackgroundTaskType::APPLICATION_PURGE_CONTENT})
+
+    expect(res.data[0].status).to(eq("running"))
+    expect(WebMock).to(
+      have_requested(
+        :get,
+        "#{host}/api/v1/background-task?task=application.purge_content"
+      )
+    )
+  end
+
+  it "non-camelCase field name" do
+    stub_request(:post, "#{host}/api/v1/event-type/import/openapi")
+      .to_return(
+        status: 200,
+        body: EventTypeImportOpenApiOut_JSON
+      )
+
+    res = svx.event_type.import_openapi(Svix::EventTypeImportOpenApiIn.new(dry_run: true))
+
+    expect(res.data.to_modify).to(be_a_kind_of(Array))
+    expect(WebMock).to(
+      have_requested(
+        :post,
+        "#{host}/api/v1/event-type/import/openapi"
+      )
+    )
+  end
+
+  it "patch request body" do
+    stub_request(:patch, "#{host}/api/v1/app/app_id/endpoint/endpoint_id")
+      .to_return(
+        status: 200,
+        body: EndpointOut_JSON
+      )
+
+    # nullable field is set to nil
+    svx.endpoint.patch("app_id", "endpoint_id", Svix::EndpointPatch.new(channels: nil))
+    expect(WebMock).to(
+      have_requested(
+        :patch,
+        "#{host}/api/v1/app/app_id/endpoint/endpoint_id"
+      )
+        .with(body: "{\"channels\":null}")
+    )
+    # nullable field not set at all, and non-nullable field set to nil
+    svx.endpoint.patch("app_id", "endpoint_id", Svix::EndpointPatch.new(description: nil))
+    expect(WebMock).to(
+      have_requested(
+        :patch,
+        "#{host}/api/v1/app/app_id/endpoint/endpoint_id"
+      )
+        .with(body: "{}")
+    )
+    # false is an explicit value for non-nullable booleans
+    svx.endpoint.patch("app_id", "endpoint_id", Svix::EndpointPatch.new(disabled: false))
+    expect(WebMock).to(
+      have_requested(
+        :patch,
+        "#{host}/api/v1/app/app_id/endpoint/endpoint_id"
+      )
+        .with(body: "{\"disabled\":false}")
+    )
+    # Ruby considers an empty string truthy, so it can clear a description.
+    svx.endpoint.patch("app_id", "endpoint_id", Svix::EndpointPatch.new(description: ""))
+    expect(WebMock).to(
+      have_requested(
+        :patch,
+        "#{host}/api/v1/app/app_id/endpoint/endpoint_id"
+      )
+        .with(body: "{\"description\":\"\"}")
+    )
+    # nullable field set
+    svx.endpoint.patch("app_id", "endpoint_id", Svix::EndpointPatch.new(channels: ["ch1", "ch2"]))
+    expect(WebMock).to(
+      have_requested(
+        :patch,
+        "#{host}/api/v1/app/app_id/endpoint/endpoint_id"
+      )
+        .with(body: "{\"channels\":[\"ch1\",\"ch2\"]}")
+    )
+  end
+
+  it "accepts symbol keys for struct enum content" do
+    sink = Svix::AutoConfigSinkType.new(
+      config: Svix::AutoConfigSinkTypeConfig::Http.new(url: "https://example.com/webhook")
+    )
+
+    expect(sink.serialize).to(
+      eq(
+        "type" => "http",
+        "config" => {"url" => "https://example.com/webhook"}
+      )
+    )
+  end
+
+  it "supports the JSON generator protocol for models" do
+    model = Svix::ApplicationIn.new(name: "example")
+
+    expect(model.to_json).to(eq('{"name":"example"}'))
+    expect(JSON.generate([model])).to(eq('[{"name":"example"}]'))
+    expect(JSON.parse(JSON.generate({model: model}, space: " "))).to(
+      eq("model" => {"name" => "example"})
+    )
+  end
+
+  it "serializes false values in patch models" do
+    expect(Svix::EndpointTransformationPatch.new(enabled: false).serialize)
+      .to(eq({"enabled" => false}))
+    expect(Svix::IngestEndpointTransformationPatch.new(enabled: false).serialize)
+      .to(eq({"enabled" => false}))
+    expect(Svix::EventTypePatch.new(archived: false, deprecated: false).serialize)
+      .to(eq({"archived" => false, "deprecated" => false}))
+    expect(Svix::StreamEventTypePatch.new(archived: false, deprecated: false).serialize)
+      .to(eq({"archived" => false, "deprecated" => false}))
+  end
+
+  it "serializes false values in non-patch models" do
+    expect(Svix::EndpointIn.new(url: "http://example.com", disabled: false).serialize)
+      .to(eq({"url" => "http://example.com", "disabled" => false}))
+    expect(Svix::EventTypeIn.new(name: "event.type", archived: false).serialize)
+      .to(eq({"name" => "event.type", "archived" => false}))
+  end
+
+  it "arbitrary json object body" do
+    stub_request(:post, "#{host}/api/v1/app/app_id/msg")
+      .with(query: hash_including({}))
+      .to_return(
+        status: 200,
+        body: MessageOut_JSON
+      )
+
+    svx.message.create("app_id", Svix::MessageIn.new(payload: {"key" => "val"}))
+
+    expect(WebMock).to(
+      have_requested(
+        :post,
+        "#{host}/api/v1/app/app_id/msg?with_content=false"
+      )
+        .with(body: "{\"payload\":{\"key\":\"val\"}}")
+    )
+  end
+
+  it "MessageAttemptOut without msg" do
+    stub_request(:get, "#{host}/api/v1/app/app/attempt/endpoint/edp")
+      .with(query: hash_including({}))
+      .to_return(
+        status: 200,
+        body: ListResponseMessageAttemptOut_without_msg_JSON
+      )
+    # make sure we don't panic here
+    svx.message_attempt.list_by_endpoint("app", "edp")
+  end
+
+  it "test retry for status => 500" do
+    stub_request(:get, "#{host}/api/v1/app")
+      .to_return(status: 500)
+    expect { svx.application.list }.to(raise_error(Svix::ApiError))
+
+    matched_requests = []
+    WebMock::RequestRegistry.instance.requested_signatures.each do |request|
+      matched_requests << request
+    end
+
+    expect(matched_requests.length).to(be(4))
+    req_id = matched_requests[0].headers["Svix-Req-Id"]
+
+    matched_requests.each_with_index do |req, index|
+      expect(req.headers["Svix-Req-Id"]).to(eq(req_id))
+      unless index == 0
+        expect(req.headers["Svix-Retry-Count"]).to(eq(String(index)))
+      end
+    end
+  end
+
+  it "retries on timeout" do
+    stub_request(:get, "#{host}/api/v1/app")
+      .to_timeout.then
+      .to_return(status: 200, body: ListResponseAppOut_JSON)
+
+    svx.application.list
+
+    expect(WebMock).to(have_requested(:get, "#{host}/api/v1/app").twice)
+    expect(WebMock).to(
+      have_requested(:get, "#{host}/api/v1/app").with(headers: {"Svix-Retry-Count" => "1"}).once
+    )
+  end
+
+  it "retries on connection error" do
+    stub_request(:get, "#{host}/api/v1/app")
+      .to_raise(Errno::ECONNREFUSED).then
+      .to_return(status: 200, body: ListResponseAppOut_JSON)
+
+    svx.application.list
+
+    expect(WebMock).to(have_requested(:get, "#{host}/api/v1/app").twice)
+  end
+
+  it "raises a Timeout::Error after retries are exhausted" do
+    stub_request(:get, "#{host}/api/v1/app").to_timeout
+
+    expect { svx.application.list }.to(raise_error(Timeout::Error))
+
+    expect(WebMock).to(have_requested(:get, "#{host}/api/v1/app").times(4))
+  end
+
+  it "struct enum with extra fields" do
+    json_source_in = '{"name":"My Stripe Source","uid":"src_123","type":"cron","config":{"contentType":"test","payload":"boom","schedule":"* * * * *"}}'
+    source_in = Svix::IngestSourceIn.new(
+      {
+        "name" => "My Stripe Source",
+        "uid" => "src_123",
+        "config" => Svix::IngestSourceInConfig::Cron.new(
+          {
+            content_type: "test",
+            payload: "boom",
+            schedule: "* * * * *"
+          }
+        )
+      }
+    )
+    loaded_from_json = Svix::IngestSourceIn.deserialize(JSON.parse(json_source_in))
+    expect(loaded_from_json).to(have_attributes(
+      name: source_in.name,
+      uid: source_in.uid
+    ))
+    expect(loaded_from_json.config.class).to eql(Svix::IngestSourceInConfig::Cron)
+    expect(loaded_from_json.config.content_type).to eql(source_in.config.content_type)
+    expect(loaded_from_json.config.payload).to eql(source_in.config.payload)
+    expect(loaded_from_json.config.schedule).to eql(source_in.config.schedule)
+  end
+
+  it "deserializes struct enum when config is omitted" do
+    loaded = Svix::DestinationIn.deserialize(JSON.parse('{"type":"pollingEndpoint"}'))
+    expect(loaded.config).to be_a(Svix::DestinationInConfig::PollingEndpoint)
+  end
+
+  it "struct enum without any fields" do
+    json_source_in = '{"name":"My Stripe Source","uid":"src_123","type":"generic-webhook","config":{}}'
+    source_in = Svix::IngestSourceIn.new(
+      {
+        "name" => "My Stripe Source",
+        "uid" => "src_123",
+        "config" => Svix::IngestSourceInConfig::GenericWebhook.new
+      }
+    )
+    loaded_from_json = Svix::IngestSourceIn.deserialize(JSON.parse(json_source_in))
+    expect(loaded_from_json).to(have_attributes(
+      name: source_in.name,
+      uid: source_in.uid
+    ))
+    expect(loaded_from_json.config.class).to eql(Svix::IngestSourceInConfig::GenericWebhook)
+  end
+
+  it "application get_or_create" do
+    stub_request(:post, "#{host}/api/v1/app?get_if_exists=true")
+      .to_return(
+        status: 200,
+        body: ApplicationOut_JSON
+      )
+
+    svx.application.get_or_create({})
+
+    expect(WebMock).to(have_requested(:post, "#{host}/api/v1/app?get_if_exists=true"))
+  end
+
+  it "test idempotency key is sent for create request" do
+    stub_request(:post, "#{host}/api/v1/app")
+      .to_return(
+        status: 200,
+        body: ApplicationOut_JSON
+      )
+
+    svx.application.create(Svix::ApplicationIn.new(name: "test app"))
+
+    expect(WebMock).to(
+      have_requested(:post, "#{host}/api/v1/app")
+    )
+
+    # Check that the idempotency key starts with "auto_"
+    request = WebMock::RequestRegistry.instance.requested_signatures.hash.first[0]
+    expect(request.headers["Idempotency-Key"]).to(start_with("auto_"))
+  end
+
+  it "test client provided idempotency key is not overridden" do
+    stub_request(:post, "#{host}/api/v1/app")
+      .to_return(
+        status: 200,
+        body: ApplicationOut_JSON
+      )
+
+    client_provided_key = "test-key-123"
+    svx.application.create(
+      Svix::ApplicationIn.new(name: "test app"),
+      {"idempotency-key" => client_provided_key}
+    )
+
+    expect(WebMock).to(
+      have_requested(:post, "#{host}/api/v1/app")
+    )
+
+    request = WebMock::RequestRegistry.instance.requested_signatures.hash.first[0]
+    expect(request.headers["Idempotency-Key"]).to(eq(client_provided_key))
+  end
+
+  it "test unknown keys are ignored" do
+    stub_request(:get, "#{host}/api/v1/app")
+      .to_return(
+        status: 200,
+        body: '{"data":[],"done":true,"iterator":null,"prevIterator":null,"extra-key":"ignored"}'
+      )
+
+    svx.application.list
+
+    expect(WebMock).to(
+      have_requested(:get, "#{host}/api/v1/app")
+    )
+  end
+end

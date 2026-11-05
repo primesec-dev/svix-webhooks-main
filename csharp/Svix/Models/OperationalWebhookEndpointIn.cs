@@ -1,0 +1,54 @@
+// this file is @generated
+using System.Text;
+using Newtonsoft.Json;
+
+namespace Svix.Models
+{
+    public class OperationalWebhookEndpointIn
+    {
+        [JsonProperty("url", Required = Required.Always)]
+        public required string Url { get; set; }
+
+        [JsonProperty("description")]
+        public string? Description { get; set; } = null;
+
+        [JsonProperty("throttleRate")]
+        public ushort? ThrottleRate { get; set; } = null;
+
+        [JsonProperty("uid")]
+        public string? Uid { get; set; } = null;
+
+        [JsonProperty("disabled")]
+        public bool? Disabled { get; set; } = null;
+
+        [JsonProperty("eventTypes")]
+        public List<string>? EventTypes { get; set; } = null;
+
+        [JsonProperty("secret")]
+        public string? Secret { get; set; } = null;
+
+        [JsonProperty("metadata")]
+        public Dictionary<string, string>? Metadata { get; set; } = null;
+
+        [JsonProperty("headers")]
+        public Dictionary<string, string>? Headers { get; set; } = null;
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append("class OperationalWebhookEndpointIn {\n");
+            sb.Append("  Url: ").Append(Url).Append('\n');
+            sb.Append("  Description: ").Append(Description).Append('\n');
+            sb.Append("  ThrottleRate: ").Append(ThrottleRate).Append('\n');
+            sb.Append("  Uid: ").Append(Uid).Append('\n');
+            sb.Append("  Disabled: ").Append(Disabled).Append('\n');
+            sb.Append("  EventTypes: ").Append(EventTypes).Append('\n');
+            sb.Append("  Secret: ").Append(Secret).Append('\n');
+            sb.Append("  Metadata: ").Append(Metadata).Append('\n');
+            sb.Append("  Headers: ").Append(Headers).Append('\n');
+            sb.Append("}\n");
+            return sb.ToString();
+        }
+    }
+}

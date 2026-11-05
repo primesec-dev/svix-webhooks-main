@@ -1,0 +1,60 @@
+# frozen_string_literal: true
+# This file is @generated
+require "json"
+
+module Svix
+  class EventExampleIn
+    # The event type's name
+    attr_accessor :event_type
+    # If the event type schema contains an array of examples, chooses which one to send.
+    #
+    # Defaults to the first example. Ignored if the schema doesn't contain an array of examples.
+    attr_accessor :example_index
+    # Custom payload to send as an example
+    #
+    # This is only available to allow-listed customers and should otherwise not be passed. Please
+    # contact us if you need access to this functionality
+    attr_accessor :payload
+
+    ALL_FIELD ||= ["event_type", "example_index", "payload"].freeze
+    private_constant :ALL_FIELD
+
+    def initialize(attributes = {})
+      unless attributes.is_a?(Hash)
+        fail(ArgumentError, "The input argument (attributes) must be a hash in `Svix::EventExampleIn` new method")
+      end
+
+      attributes.each do |k, v|
+        unless ALL_FIELD.include?(k.to_s)
+          fail(ArgumentError, "The field #{k} is not part of Svix::EventExampleIn")
+        end
+
+        instance_variable_set("@#{k}", v)
+        instance_variable_set("@__#{k}_is_defined", true)
+      end
+    end
+
+    def self.deserialize(attributes = {})
+      attributes = attributes.transform_keys(&:to_s)
+      attrs = Hash.new
+      attrs["event_type"] = attributes["eventType"]
+      attrs["example_index"] = attributes["exampleIndex"]
+      attrs["payload"] = attributes["payload"]
+      new(attrs)
+    end
+
+    def serialize
+      out = Hash.new
+      out["eventType"] = Svix::serialize_primitive(@event_type) unless @event_type.nil?
+      out["exampleIndex"] = Svix::serialize_primitive(@example_index) unless @example_index.nil?
+      out["payload"] = Svix::serialize_primitive(@payload) unless @payload.nil?
+      out
+    end
+
+    # Serializes the object to a json string
+    # @return String
+    def to_json(*args)
+      serialize.to_json(*args)
+    end
+  end
+end
